@@ -1,0 +1,6 @@
+[submodule "deps/recordlogs"]
+	path = deps/recordlogs
+	url = https://github.com/yinyin/recordlogs.git
+[submodule "deps/signalhandling"]
+	path = deps/signalhandling
+	url = https://github.com/yinyin/signalhandling.git
