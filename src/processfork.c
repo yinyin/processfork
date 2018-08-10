@@ -42,7 +42,7 @@ pid_t processfork_daemonize_fork() {
         RECORD_ERROR(LOG_ERR, "cannot create new session.");
         return -1;
     }
-    if (0 != ignore_signal(SIGHUP)) {
+    if (0 != signalhandling_ignore_signal(SIGHUP)) {
         return -1;
     }
     ret_id = fork_for_daemonize(2);
