@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-int close_nonstdio_fd();
+int processfork_close_nonstdio_fd();
 
 #ifdef __cplusplus
 }

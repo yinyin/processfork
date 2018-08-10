@@ -8,13 +8,13 @@ extern "C" {
 #include <sys/types.h>
 #include <unistd.h>
 
-pid_t daemonize_fork();
+pid_t processfork_daemonize_fork();
 
-pid_t execve_fork(int fd_stdin,
-                  int fd_stdout,
-                  int fd_stderr,
-                  char* const cmd_argv[],
-                  char* const cmd_envp[]);
+pid_t processfork_execve_fork(int fd_stdin,
+                              int fd_stdout,
+                              int fd_stderr,
+                              char* const cmd_argv[],
+                              char* const cmd_envp[]);
 
 #ifdef __cplusplus
 }

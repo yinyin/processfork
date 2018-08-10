@@ -66,7 +66,7 @@ static int collect_nonstdio_fd(int *fd_collect_buffer,
     closedir(dp);
     return next_fd_idx;
 }
-static int _close_nonstdio_fd_fdfolder(const char *fd_folder_path) {
+static int close_nonstdio_fd_fdfolder(const char *fd_folder_path) {
     int fd_collect_buffer[FD_COLLECT_BUFFER_COUNT];
     int collected_count;
     int failure_count = 0;
@@ -87,7 +87,7 @@ static int _close_nonstdio_fd_fdfolder(const char *fd_folder_path) {
     return 0;
 }
 #else
-static int _close_nonstdio_fd_posix() {
+static int close_nonstdio_fd_posix() {
     int max_fd = (int)(sysconf(_SC_OPEN_MAX));
     for (int fd = 3; fd < max_fd; fd++) {
         close(fd);
@@ -96,12 +96,12 @@ static int _close_nonstdio_fd_posix() {
 }
 #endif /* check platform */
 
-int close_nonstdio_fd() {
+int processfork_close_nonstdio_fd() {
 #if defined(__linux__)
-    return _close_nonstdio_fd_fdfolder("/proc/self/fd");
+    return close_nonstdio_fd_fdfolder("/proc/self/fd");
 #elif defined(__APPLE__)
-    return _close_nonstdio_fd_fdfolder("/dev/fd");
+    return close_nonstdio_fd_fdfolder("/dev/fd");
 #else
-    return _close_nonstdio_fd_posix();
+    return close_nonstdio_fd_posix();
 #endif
 }

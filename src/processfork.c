@@ -31,7 +31,7 @@ static pid_t fork_for_daemonize(int fork_stage) {
     return ret_id;
 }
 
-pid_t daemonize_fork() {
+pid_t processfork_daemonize_fork() {
     pid_t ret_id;
     ret_id = fork_for_daemonize(1);
     if ((0 == ret_id) || (-1 == ret_id)) {
@@ -65,18 +65,18 @@ static pid_t fork_for_exec() {
     return ret_id;
 }
 
-pid_t execve_fork(int fd_stdin,
-                  int fd_stdout,
-                  int fd_stderr,
-                  char* const cmd_argv[],
-                  char* const cmd_envp[]) {
+pid_t processfork_execve_fork(int fd_stdin,
+                              int fd_stdout,
+                              int fd_stderr,
+                              char* const cmd_argv[],
+                              char* const cmd_envp[]) {
     pid_t ret_id;
     ret_id = fork_for_exec();
     if ((0 < ret_id) || (-1 == ret_id)) {
         return ret_id;
     }
     processfork_redirect_stdio_fd(fd_stdin, fd_stdout, fd_stderr);
-    close_nonstdio_fd();
+    processfork_close_nonstdio_fd();
     execve(cmd_argv[0], cmd_argv, cmd_envp);
     exit(126);
     return -1;
