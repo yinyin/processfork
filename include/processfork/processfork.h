@@ -10,9 +10,16 @@ extern "C" {
 
 pid_t processfork_daemonize_fork();
 
-pid_t processfork_execve_fork(int fd_stdin,
-                              int fd_stdout,
-                              int fd_stderr,
+typedef struct {
+    const char* work_directory_path;
+    uid_t run_user_id;
+    gid_t run_group_id;
+    int fd_stdin;
+    int fd_stdout;
+    int fd_stderr;
+} ProcessForkStartupProperty;
+
+pid_t processfork_execve_fork(ProcessForkStartupProperty* startup_prop,
                               char* const cmd_argv[],
                               char* const cmd_envp[]);
 

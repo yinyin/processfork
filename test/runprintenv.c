@@ -10,8 +10,8 @@ int main(int argc, char* const argv[]) {
     char* const child_envp[] = {"PATH=/usr/bin:/bin", NULL};
     pid_t child_pid;
     int retcode;
-    if (-1 == (child_pid = processfork_execve_fork(
-                       -1, -1, -1, child_argv, child_envp))) {
+    if (-1 ==
+        (child_pid = processfork_execve_fork(NULL, child_argv, child_envp))) {
         fprintf(stderr, "Failed on invoke child program\n");
         return 1;
     }

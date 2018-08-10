@@ -11,6 +11,7 @@
 
 #include "processfork/changeprocessproperty.h"
 #include "processfork/closenonstdiofd.h"
+#include "processfork/processfork.h"
 
 static pid_t fork_for_daemonize(int fork_stage) {
     pid_t ret_id;
@@ -65,9 +66,34 @@ static pid_t fork_for_exec() {
     return ret_id;
 }
 
-pid_t processfork_execve_fork(int fd_stdin,
-                              int fd_stdout,
-                              int fd_stderr,
+static int apply_startup_property(ProcessForkStartupProperty* startup_prop) {
+    if (NULL == startup_prop) {
+        return 0;
+    }
+    if (NULL != startup_prop->work_directory_path) {
+        if (0 != processfork_change_work_directory(
+                         startup_prop->work_directory_path)) {
+            return -1;
+        }
+    }
+    if ((0 != startup_prop->fd_stdin) || (0 != startup_prop->fd_stdout) ||
+        (0 != startup_prop->fd_stderr)) {
+        if (0 != processfork_redirect_stdio_fd(startup_prop->fd_stdin,
+                                               startup_prop->fd_stdout,
+                                               startup_prop->fd_stderr)) {
+            return -2;
+        }
+    }
+    if ((0 != startup_prop->run_user_id) || (0 != startup_prop->run_group_id)) {
+        if (0 != processfork_set_run_account(startup_prop->run_user_id,
+                                             startup_prop->run_group_id)) {
+            return -3;
+        }
+    }
+    return 0;
+}
+
+pid_t processfork_execve_fork(ProcessForkStartupProperty* startup_prop,
                               char* const cmd_argv[],
                               char* const cmd_envp[]) {
     pid_t ret_id;
@@ -75,9 +101,13 @@ pid_t processfork_execve_fork(int fd_stdin,
     if ((0 < ret_id) || (-1 == ret_id)) {
         return ret_id;
     }
-    processfork_redirect_stdio_fd(fd_stdin, fd_stdout, fd_stderr);
-    processfork_close_nonstdio_fd();
-    execve(cmd_argv[0], cmd_argv, cmd_envp);
-    exit(126);
+    do {
+        if (0 != apply_startup_property(startup_prop)) {
+            break;
+        }
+        processfork_close_nonstdio_fd();
+        execve(cmd_argv[0], cmd_argv, cmd_envp);
+    } while (0);
+    exit(125);
     return -1;
 }
