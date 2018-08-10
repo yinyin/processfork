@@ -16,7 +16,7 @@ int processfork_change_work_directory(const char* work_directory_path) {
     return 0;
 }
 
-int processfork_change_run_account(uid_t run_uid, gid_t run_gid) {
+int processfork_set_run_account(uid_t run_uid, gid_t run_gid) {
     if (0 != run_gid) {
         if (0 != setgid(run_gid)) {
             RECORD_ERROR(LOG_ERR, "failed on set GID as [%d]", (int)(run_gid));
