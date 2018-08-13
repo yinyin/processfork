@@ -6,7 +6,10 @@ CFLAGS := $(CFLAGS) \
 		-Wall
 
 BASE_CODE_FILES := \
-		src/closenonstdiofd.c src/changeprocessproperty.c src/processfork.c \
+		src/closenonstdiofd.c			\
+		src/changeprocessproperty.c		\
+		src/signalprocessgroup.c		\
+		src/processfork.c				\
 		deps/signalhandling/src/signalhandling.c \
 		deps/recordlogs/src/recordlogs_stderrprintf.c
 
