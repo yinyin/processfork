@@ -93,14 +93,31 @@ static int apply_startup_property(ProcessForkStartupProperty* startup_prop) {
     return 0;
 }
 
+static void setup_process_group(pid_t process_id) {
+    if (0 == setpgid(process_id, 0)) {
+        return;
+    }
+    if (EACCES != errno) {
+        RECORD_ERROR(
+                LOG_WARNING,
+                "failed on adjust group ID of process [%d] from process [%d]",
+                (int)(process_id),
+                (int)(getpid()));
+    }
+}
+
 pid_t processfork_execve_fork(ProcessForkStartupProperty* startup_prop,
                               char* const cmd_argv[],
                               char* const cmd_envp[]) {
     pid_t ret_id;
     ret_id = fork_for_exec();
-    if ((0 < ret_id) || (-1 == ret_id)) {
+    if (0 < ret_id) {
+        setup_process_group(ret_id);
         return ret_id;
+    } else if (-1 == ret_id) {
+        return -1;
     }
+    setup_process_group(0);
     do {
         if (0 != apply_startup_property(startup_prop)) {
             break;
