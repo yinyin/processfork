@@ -70,10 +70,16 @@ static int apply_startup_property(ProcessForkStartupProperty* startup_prop) {
     if (NULL == startup_prop) {
         return 0;
     }
+    if (NULL != startup_prop->original_sigmask) {
+        if (0 !=
+            sigprocmask(SIG_SETMASK, startup_prop->original_sigmask, NULL)) {
+            return -1;
+        }
+    }
     if (NULL != startup_prop->work_directory_path) {
         if (0 != processfork_change_work_directory(
                          startup_prop->work_directory_path)) {
-            return -1;
+            return -2;
         }
     }
     if ((0 != startup_prop->fd_stdin) || (0 != startup_prop->fd_stdout) ||
@@ -81,13 +87,13 @@ static int apply_startup_property(ProcessForkStartupProperty* startup_prop) {
         if (0 != processfork_redirect_stdio_fd(startup_prop->fd_stdin,
                                                startup_prop->fd_stdout,
                                                startup_prop->fd_stderr)) {
-            return -2;
+            return -3;
         }
     }
     if ((0 != startup_prop->run_user_id) || (0 != startup_prop->run_group_id)) {
         if (0 != processfork_set_run_account(startup_prop->run_user_id,
                                              startup_prop->run_group_id)) {
-            return -3;
+            return -4;
         }
     }
     return 0;

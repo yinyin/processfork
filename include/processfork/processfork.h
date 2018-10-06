@@ -5,12 +5,14 @@
 extern "C" {
 #endif
 
+#include <signal.h>
 #include <sys/types.h>
 #include <unistd.h>
 
 pid_t processfork_daemonize_fork();
 
 typedef struct {
+    const sigset_t* original_sigmask;
     const char* work_directory_path;
     uid_t run_user_id;
     gid_t run_group_id;
