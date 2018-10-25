@@ -64,4 +64,4 @@ tags
 build/**
 
 test/runprintenv
-
+test/daemonizedsleep

@@ -13,8 +13,13 @@ BASE_CODE_FILES := \
 		deps/signalhandling/src/signalhandling.c \
 		deps/recordlogs/src/recordlogs_stderrprintf.c
 
+all: test/runprintenv test/daemonizedsleep
+
 test/runprintenv: test/runprintenv.c $(BASE_CODE_FILES)
 	$(CC) $(CFLAGS) -o $@ $^
 
+test/daemonizedsleep: test/daemonizedsleep.c $(BASE_CODE_FILES)
+	$(CC) $(CFLAGS) -o $@ $^
+
 clean:
-	$(RM) test/runprintenv
+	$(RM) test/runprintenv test/daemonizedsleep
