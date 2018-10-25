@@ -13,7 +13,13 @@
 #include "processfork/closenonstdiofd.h"
 #include "processfork/processfork.h"
 
-static pid_t fork_for_daemonize(int fork_stage) {
+/* (internal)
+ * Return:
+ *  -1 on failure,
+ *  1 on child (which application logic goes usually),
+ *  0 on parent.
+ */
+static int fork_for_daemonize(int fork_stage) {
     pid_t ret_id;
     ret_id = fork();
     if (-1 == ret_id) {
@@ -21,22 +27,23 @@ static pid_t fork_for_daemonize(int fork_stage) {
                      "cannot perform stage-%d fork for daemonize.",
                      fork_stage);
         return -1;
-    } else if (0 < ret_id) {
-        return 0;
+    } else if (0 == ret_id) {
+        return 1;
     }
-    if (0 != ret_id) {
+    if (0 > ret_id) {
         RECORD_ERROR(LOG_WARNING,
                      "result of fork < 0: %lld.",
                      (long long int)(ret_id));
     }
-    return ret_id;
+    return 0;
 }
 
-pid_t processfork_daemonize_fork() {
+int processfork_daemonize_fork() {
+    int retcode;
     pid_t ret_id;
-    ret_id = fork_for_daemonize(1);
-    if ((0 == ret_id) || (-1 == ret_id)) {
-        return ret_id;
+    retcode = fork_for_daemonize(1);
+    if ((0 == retcode) || (-1 == retcode)) {
+        return retcode;
     }
     if (-1 == (ret_id = setsid())) {
         RECORD_ERROR(LOG_ERR, "cannot create new session.");
@@ -45,8 +52,8 @@ pid_t processfork_daemonize_fork() {
     if (0 != signalhandling_ignore_signal(SIGHUP)) {
         return -1;
     }
-    ret_id = fork_for_daemonize(2);
-    return ret_id;
+    retcode = fork_for_daemonize(2);
+    return retcode;
 }
 
 static pid_t fork_for_exec() {

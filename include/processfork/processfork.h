@@ -9,7 +9,7 @@ extern "C" {
 #include <sys/types.h>
 #include <unistd.h>
 
-pid_t processfork_daemonize_fork();
+int processfork_daemonize_fork();
 
 typedef struct {
     const sigset_t* original_sigmask;
